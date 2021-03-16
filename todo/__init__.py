@@ -3,9 +3,9 @@ import os
 from flask import Flask
 
 def create_app():
-    app = Flask(__name__)
+    application = Flask(__name__)
 
-    app.config.from_mapping(
+    application.config.from_mapping(
         SECRET_KEY = 'mikey'
         , DATABASE_HOST = os.environ.get('FLASK_DATABASE_HOST')
         , DATABASE_PASSWORD = os.environ.get('FLASK_DATABASE_PASSWORD')
@@ -14,11 +14,13 @@ def create_app():
     )
 
     from . import database
+    database.initializeApp(application)
 
-    database.initializeApp(app)
+    from . import authentication
+    application.registe.blueprint(authentication.bluePrint)
 
-    @app.route('/hola')
+    @application.route('/hola')
     def hola():
         return 'Hola mundo'
 
-    return app
+    return application
