@@ -13,6 +13,10 @@ def create_app():
         , DATABASE = os.environ.get('FLASK_DATABASE')
     )
 
+    from . import database
+
+    database.init_app(app)
+
     @app.route('/hola')
     def hola():
         return 'Hola mundo'
