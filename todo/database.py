@@ -1,27 +1,42 @@
 import mysql.connector
 
 import click
-from flask import current_app, g as global
+from flask import current_app, g
 from flask.cli import with_appcontext
-from .scheme import instructions
+from .schema import instructions
 
 def getDatabase():
-    if 'database' not in global:
-        global.database = mysql.connector.connect(
+    if 'database' not in g:
+        g.database = mysql.connector.connect(
             host = current_app.config['DATABASE_HOST']
             , user = current_app.config['DATABASE_USER']
             , password = current_app.config['DATABASE_PASSWORD']
             , database = current_app.config['DATABASE']
         )
 
-        global.cursor = global.database.cursor(dictionary = True)
-    return global.database, global.cursor
+        g.cursor = g.database.cursor(dictionary = True)
+    return g.database, g.cursor
 
-def closeDatabase(e = None)
-    database = global.pop('database', None)
+def closeDatabase(e = None):
+    database = g.pop('database', None)
 
     if database is not None:
         database.close()
 
-def init_app(app)
-    app.teardown_appcontext(closeDatabase)
+def initializeDatabase():
+    database, cursor = getDatabase()
+
+    for instruction in instructions:
+        cursor.execute(instruction)
+
+    database.commit()
+
+@click.command('init-db')
+@with_appcontext
+def initializeDatabaseCommand():
+    initializeDatabase()
+    click.echo('Bse de datos inicializada')
+
+def initializeApp(aplication):
+    aplication.teardown_appcontext(closeDatabase)
+    aplication.cli.add_command(initializeDatabaseCommand)
