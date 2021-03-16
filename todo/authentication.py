@@ -24,7 +24,7 @@ def register():
         database, cursor = getDatabase()
 
         cursor.execute(
-            'SELECT id FROM user WHERE username = %s'
+            'SELECT id FROM user WHERE username = %s', (username,)
         )
 
         if not username:
@@ -48,3 +48,34 @@ def register():
         flash(error)
     
     return render_template('auth/register.html')
+
+@bluePrint.route('/login', methods=['GET', 'POST'])
+def login():
+    error = None
+
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['pasword']
+
+        database, cursor = getDatabase()
+
+        cursor.execute(
+            'SELECT * FROM user WHERE username = %s', (username,)
+        )
+
+        user = cursor.fetchone()
+
+        if user is None:
+            error = 'Usuario y/o contraseña inválida'
+        elif not check_password_hash(user['password'], password):
+            error = 'Usuario y/o contraseña inválida'
+
+        if error is None:
+            session.clear()
+            session['user_id'] = user['id']
+            
+            return redirect(url_for('index'))
+
+        flash(error)
+
+    return render_template('auth/login.html')
