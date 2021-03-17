@@ -1,7 +1,7 @@
 import functools
 
 from flask import (
-    Blueprint, flash, g, render_template, request, url_for, session
+    Blueprint, flash, g, render_template, request, url_for, session, redirect
 )
 
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -43,7 +43,7 @@ def register():
 
             database.commit()
 
-            return redirect(url_for('authentication.login'))
+            return redirect(url_for('auth.login'))
 
         flash(error)
     
@@ -55,7 +55,7 @@ def login():
 
     if request.method == 'POST':
         username = request.form['username']
-        password = request.form['pasword']
+        password = request.form['password']
 
         database, cursor = getDatabase()
 
