@@ -17,7 +17,10 @@ def create_app():
     database.initializeApp(application)
 
     from . import authentication
+    from . import todo
+
     application.register_blueprint(authentication.bluePrint)
+    application.register_blueprint(todo.blueprint)
 
     @application.route('/hola')
     def hola():

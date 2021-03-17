@@ -79,3 +79,29 @@ def login():
         flash(error)
 
     return render_template('auth/login.html')
+
+@bluePrint.before_app_request
+def loadLogguedInUser():
+    userId = session.get('user_id')
+
+    if userId is None:
+        g.user = None
+    else:
+        database, cursor = getDatabase()
+
+        cursor.execute(
+            'SELECT * FROM user WHERE id = %s', (userId,)
+        )
+
+        g.user = cursor.fetchone()
+
+def loginRequired(view):
+
+    @functools.wraps(view)
+    def wrappedView(**kwargs):
+        if g.user is None:
+            return redirect(url_for('auth.login'))
+
+        return view(**kwargs)
+
+    return wrappedView
