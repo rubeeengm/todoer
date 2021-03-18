@@ -98,4 +98,13 @@ def update(id):
 @blueprint.route('/<int:id>/delete', methods=['POST'])
 @loginRequired
 def delete(id):
-    return ''
+    database, cursor = getDatabase()
+
+    cursor.execute(
+        'DELETE FROM todo WHERE id = %s'
+        , (id,)
+    )
+
+    database.commit()
+
+    return redirect(url_for('todo.index'))
