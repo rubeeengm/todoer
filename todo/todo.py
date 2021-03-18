@@ -48,7 +48,17 @@ def create():
 
     return render_template('todo/create.html')
 
-@blueprint.route('/update', methods=['GET', 'POST'])
+@blueprint.route('/<int:id>/update', methods=['GET', 'POST'])
 @loginRequired
-def update():
+def update(id):
+    return render_template('todo/update.html', todo={
+        "description": "mi todo"
+        , "id": 2
+        , "completed": 1
+    })
+
+
+@blueprint.route('/<int:id>/delete', methods=['POST'])
+@loginRequired
+def delete(id):
     return ''
