@@ -109,4 +109,4 @@ def loginRequired(view):
 @bluePrint.route('/logout')
 def logout():
     session.clear()
-    return redirect(url_for('login'))
+    return redirect(url_for('auth.login'))

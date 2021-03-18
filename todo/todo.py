@@ -14,7 +14,9 @@ def index():
     database, cursor = getDatabase()
 
     cursor.execute(
-        'SELECT t.id, t.description, u.username, t.completed, t.created_at FROM todo t JOIN user u ON t.created_by = u.id ORDER BY created_at desc'
+        'SELECT t.id, t.description, u.username, t.completed, t.created_at '
+        'FROM todo t JOIN user u ON t.created_by = u.id WHERE t.created_by = %s ORDER BY created_at desc'
+        , (g.user['id'], )
     )
 
     todos = cursor.fetchall()
@@ -84,8 +86,8 @@ def update(id):
 
             cursor.execute(
                 'UPDATE todo SET description = %s, completed = %s '
-                'WHERE id = %s'
-                , (description, completed, id)
+                'WHERE id = %s AND created_by = %s'
+                , (description, completed, id, g.user['id'])
             )
 
             database.commit()
@@ -101,8 +103,8 @@ def delete(id):
     database, cursor = getDatabase()
 
     cursor.execute(
-        'DELETE FROM todo WHERE id = %s'
-        , (id,)
+        'DELETE FROM todo WHERE id = %s AND created_by = %s'
+        , (id, g.user['id'])
     )
 
     database.commit()
