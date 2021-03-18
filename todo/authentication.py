@@ -105,3 +105,8 @@ def loginRequired(view):
         return view(**kwargs)
 
     return wrappedView
+
+@bluePrint.route('/logout')
+def logout():
+    session.clear()
+    return redirect(url_for('login'))

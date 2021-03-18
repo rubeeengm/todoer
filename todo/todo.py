@@ -20,3 +20,13 @@ def index():
     todos = cursor.fetchall()
 
     return render_template('todo/index.html', todos = todos)
+
+@blueprint.route('/create', methods=['GET', 'POST'])
+@loginRequired
+def create():
+    return ''
+
+@blueprint.route('/update', methods=['GET', 'POST'])
+@loginRequired
+def update():
+    return ''
