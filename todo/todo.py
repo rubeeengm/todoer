@@ -48,14 +48,51 @@ def create():
 
     return render_template('todo/create.html')
 
+def getTodo(id):
+    database, cursor = getDatabase()
+
+    cursor.execute(
+        'SELECT t.id, t.description, t.completed, t.created_by, t.created_at, u.username '
+        'FROM todo t JOIN user u ON t.created_by = u.id WHERE t.id = %s'
+        , (id, )
+    )
+
+    todo = cursor.fetchone()
+
+    if todo is None:
+        abort(404, "El todo de id {0} no existe".format(id))
+
+    return todo
+
 @blueprint.route('/<int:id>/update', methods=['GET', 'POST'])
 @loginRequired
 def update(id):
-    return render_template('todo/update.html', todo={
-        "description": "mi todo"
-        , "id": 2
-        , "completed": 1
-    })
+    todo = getTodo(id)
+
+    if request.method == 'POST':
+        description = request.form['description']
+        completed = True if request.form.get('completed') == 'on' else False
+        error = None
+
+        if not description:
+            error = "La descripción es requerida."
+
+        if error is not None:
+            flash(error)
+        else:
+            database, cursor = getDatabase()
+
+            cursor.execute(
+                'UPDATE todo SET description = %s, completed = %s '
+                'WHERE id = %s'
+                , (description, completed, id)
+            )
+
+            database.commit()
+
+            return redirect(url_for('todo.index'))
+
+    return render_template('todo/update.html', todo=todo)
 
 
 @blueprint.route('/<int:id>/delete', methods=['POST'])
