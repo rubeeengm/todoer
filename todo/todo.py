@@ -24,7 +24,7 @@ def index():
 @blueprint.route('/create', methods=['GET', 'POST'])
 @loginRequired
 def create():
-    return ''
+    return render_template('todo/create.html')
 
 @blueprint.route('/update', methods=['GET', 'POST'])
 @loginRequired
