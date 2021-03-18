@@ -24,6 +24,28 @@ def index():
 @blueprint.route('/create', methods=['GET', 'POST'])
 @loginRequired
 def create():
+    if request.method == 'POST':
+        description = request.form['description']
+        error = None
+
+        if not description:
+            error = 'Descripción es requerida.'
+
+        if error is not None:
+            flash(error)
+        else:
+            database, cursor = getDatabase()
+
+            cursor.execute(
+                'INSERT INTO todo (description, completed, created_by)'
+                ' VALUES (%s, %s, %s)'
+                , (description, False, g.user['id'])
+            )
+
+            database.commit()
+
+            return redirect(url_for('todo.index'))
+
     return render_template('todo/create.html')
 
 @blueprint.route('/update', methods=['GET', 'POST'])
